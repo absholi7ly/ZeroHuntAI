@@ -1,0 +1,178 @@
+language: python
+rules:
+  - id: PY-EVAL-EXEC-001
+    name: Use of eval() or exec()
+    description: Identifies potentially dangerous use of eval() or exec()
+    severity: High
+    patterns:
+      - type: function_call
+        name: eval
+      - type: function_call
+        name: exec
+    mitigation: Avoid using eval() or exec() with user input. Use safer alternatives like ast.literal_eval() for limited parsing.
+
+  - id: PY-SQL-INJECTION-001
+    name: Potential SQL Injection
+    description: String formatting used in SQL queries
+    severity: High
+    patterns:
+      - type: function_call
+        name: execute
+        with_string_formatting: true
+    mitigation: Use parameterized queries or ORM instead of string formatting.
+
+  - id: PY-CMD-INJECTION-001
+    name: Command Injection
+    description: Shell command execution with potential for command injection
+    severity: High
+    patterns:
+      - type: function_call
+        name: os.system
+      - type: function_call
+        name: subprocess.call
+      - type: function_call
+        name: subprocess.Popen
+      - type: function_call
+        name: os.popen
+    mitigation: Use library functions instead of shell commands. If shell commands are necessary, use shlex.quote() to sanitize inputs.
+
+  - id: PY-PICKLE-001
+    name: Unsafe Deserialization
+    description: Use of pickle or marshall with untrusted data
+    severity: High
+    patterns:
+      - type: function_call
+        name: pickle.loads
+      - type: function_call
+        name: pickle.load
+      - type: function_call
+        name: marshal.loads
+      - type: function_call
+        name: marshal.load
+    mitigation: Use safer serialization formats like JSON for untrusted data.
+
+  - id: PY-YAML-LOAD-001
+    name: Unsafe YAML Loading
+    description: Use of yaml.load() without safe loading
+    severity: High
+    patterns:
+      - type: function_call
+        name: yaml.load
+    mitigation: Use yaml.safe_load() instead of yaml.load() for untrusted YAML data.
+
+  - id: PY-PATH-TRAVERSAL-001
+    name: Path Traversal
+    description: File operations without path sanitization
+    severity: Medium
+    patterns:
+      - type: function_call
+        name: open
+    mitigation: Use os.path.normpath() and validate paths against a whitelist of allowed directories.
+
+  - id: PY-WEAK-CRYPTO-001
+    name: Weak Cryptography
+    description: Use of weak cryptographic algorithms
+    severity: Medium
+    patterns:
+      - type: import
+        name: md5
+      - type: function_call
+        name: hashlib.md5
+      - type: function_call
+        name: hashlib.sha1
+      - type: import
+        name: Crypto.Cipher.DES
+    mitigation: Use strong cryptographic algorithms like SHA-256 or higher, and use established libraries for encryption.
+
+  - id: PY-HARDCODED-SECRET-001
+    name: Hardcoded Secret
+    description: Potential hardcoded credentials or API keys
+    severity: High
+    patterns:
+      - type: assignment
+        variable_name: password
+      - type: assignment
+        variable_name: api_key
+      - type: assignment
+        variable_name: secret
+      - type: assignment
+        variable_name: token
+    mitigation: Store secrets in environment variables or a secure secret management system.
+
+  - id: PY-INSECURE-RANDOM-001
+    name: Insecure Randomness
+    description: Use of insecure random number generation
+    severity: Medium
+    patterns:
+      - type: import
+        name: random
+      - type: function_call
+        name: random.random
+      - type: function_call
+        name: random.randint
+    mitigation: Use secrets module or cryptographically secure random number generators for security purposes.
+
+  - id: PY-BARE-EXCEPT-001
+    name: Bare Except Clause
+    description: Use of bare except clause
+    severity: Low
+    patterns:
+      - type: exception_handling
+        pattern: "except:"
+    mitigation: Specify the exception types to catch, e.g., 'except Exception:' or more specific types.
+
+language: javascript
+rules:
+  - id: JS-EVAL-001
+    name: Use of eval()
+    description: Identifies potentially dangerous use of eval()
+    severity: High
+    patterns:
+      - type: function_call
+        name: eval
+    mitigation: Avoid using eval() with user input. Use alternatives like JSON.parse() for JSON data.
+
+  - id: JS-EXEC-SQL-001
+    name: SQL Injection in JS
+    description: String concatenation used in SQL queries
+    severity: High
+    patterns:
+      - type: string_concat
+        with: "SQL"
+    mitigation: Use parameterized queries or ORM instead of string concatenation.
+
+  - id: JS-XSS-001
+    name: Cross-Site Scripting
+    description: Potential XSS vulnerabilities
+    severity: High
+    patterns:
+      - type: assignment
+        target: innerHTML
+      - type: assignment
+        target: outerHTML
+      - type: function_call
+        name: document.write
+    mitigation: Use textContent instead of innerHTML where possible, or use a library that automatically escapes HTML.
+
+  - id: JS-PROTO-POLLUTION-001
+    name: Prototype Pollution
+    description: Operations that could lead to prototype pollution
+    severity: High
+    patterns:
+      - type: assignment
+        target: "__proto__"
+      - type: assignment
+        target: "prototype"
+      - type: object_merge
+    mitigation: Use Object.create(null) for dictionaries, use object-freeze, or validate keys to prevent __proto__ and constructor.
+
+  - id: JS-NOSQL-INJECTION-001
+    name: NoSQL Injection
+    description: Potential NoSQL injection in MongoDB queries
+    severity: High
+    patterns:
+      - type: function_call
+        name: findOne
+      - type: function_call
+        name: find
+    mitigation: Validate and sanitize inputs, and use query operators with fixed keys.

@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+
+{% block title %}Scan Results - ZeroHuntAI{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-dark">
+                <h3 class="card-title mb-0 text-white">Scan Results</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>
+                            <strong>Scan Type:</strong> {{ scan_mode|capitalize }}<br>
+                            <strong>Target:</strong> {{ scan_target }}
+                        </p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <div class="btn-group" role="group">
+                            {% if html_report %}
+                            <a href="{{ url_for('view_report', file_type='html') }}" target="_blank" class="btn btn-outline-primary">
+                                <i class="fas fa-eye"></i> View HTML Report
+                            </a>
+                            <a href="{{ url_for('download_report', file_type='html') }}" class="btn btn-outline-info">
+                                <i class="fas fa-download"></i> Download HTML
+                            </a>
+                            {% endif %}
+                            
+                            {% if json_report %}
+                            <a href="{{ url_for('download_report', file_type='json') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-download"></i> Download JSON
+                            </a>
+                            {% endif %}
+                            
+                            {% if call_graph %}
+                            <a href="{{ url_for('view_report', file_type='call_graph') }}" target="_blank" class="btn btn-outline-warning">
+                                <i class="fas fa-project-diagram"></i> View Call Graph
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h3>{{ scan_summary.total_files }}</h3>
+            <p>Files Scanned</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card high-card">
+            <h3 class="severity-high">{{ scan_summary.high_severity }}</h3>
+            <p>High Severity</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card medium-card">
+            <h3 class="severity-medium">{{ scan_summary.medium_severity }}</h3>
+            <p>Medium Severity</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card low-card">
+            <h3 class="severity-low">{{ scan_summary.low_severity }}</h3>
+            <p>Low Severity</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-header bg-dark d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0 text-white">Vulnerabilities</h4>
+                <div class="d-flex">
+                    <input type="text" id="vulnerabilitySearch" class="form-control form-control-sm me-2" placeholder="Search...">
+                    <select id="severityFilter" class="form-select form-select-sm me-2">
+                        <option value="all">All Severities</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="vulnerabilityTable">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Severity</th>
+                                <th scope="col">Type</th>
+                                <th scope="col">File</th>
+                                <th scope="col">Line</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for vuln in vulnerabilities %}
+                            <tr data-severity="{{ vuln.severity }}">
+                                <td>{{ loop.index }}</td>
+                                <td>
+                                    {% if vuln.severity == 'High' %}
+                                        <span class="badge bg-danger">High</span>
+                                    {% elif vuln.severity == 'Medium' %}
+                                        <span class="badge bg-warning text-dark">Medium</span>
+                                    {% else %}
+                                        <span class="badge bg-info text-dark">Low</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ vuln.type }}</td>
+                                <td>{{ vuln.file_path|basename }}</td>
+                                <td>{{ vuln.line_number }}</td>
+                                <td>{{ vuln.description|truncate(50) }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-info view-details" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#vulnerabilityModal"
+                                            data-id="{{ loop.index0 }}">
+                                        Details
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% if not vulnerabilities %}
+                            <tr>
+                                <td colspan="7" class="text-center">No vulnerabilities found.</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Vulnerability Detail Modal -->
+<div class="modal fade" id="vulnerabilityModal" tabindex="-1" aria-labelledby="vulnerabilityModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="vulnerabilityModalLabel">Vulnerability Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="vulnerabilityModalBody">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Analysis Recommendations -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-dark">
+                <h4 class="card-title mb-0 text-white">AI Recommendations</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h5><i class="fas fa-robot me-2"></i> AI Analysis</h5>
+                    <p>Based on the scan results, here are some recommendations to improve your code security:</p>
+                    <ul id="ai-recommendations">
+                        {% if scan_summary.high_severity > 0 %}
+                            <li>Address high severity vulnerabilities immediately as they represent critical security risks.</li>
+                        {% endif %}
+                        {% if scan_summary.medium_severity > 0 %}
+                            <li>Review and fix medium severity issues which may be exploitable under certain conditions.</li>
+                        {% endif %}
+                        <li>Consider implementing input validation and sanitization for all user inputs.</li>
+                        <li>Use parameterized queries for database operations to prevent SQL injection.</li>
+                        <li>Implement proper output encoding to prevent cross-site scripting (XSS) attacks.</li>
+                        <li>Review file operations to ensure they don't allow path traversal attacks.</li>
+                        <li>Remove any hardcoded credentials from your codebase.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all vulnerabilities
+        const vulnerabilities = {{ vulnerabilities|tojson }};
+        
+        // Modal detail view
+        const viewButtons = document.querySelectorAll('.view-details');
+        viewButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const vulnId = this.getAttribute('data-id');
+                const vulnerability = vulnerabilities[vulnId];
+                
+                let severityClass = 'text-info';
+                if (vulnerability.severity === 'High') {
+                    severityClass = 'text-danger';
+                } else if (vulnerability.severity === 'Medium') {
+                    severityClass = 'text-warning';
+                }
+                
+                // Create modal content
+                let modalHtml = `
+                    <div class="mb-3">
+                        <h5 class="${severityClass}">${vulnerability.severity} Severity: ${vulnerability.type}</h5>
+                        <p><strong>File:</strong> ${vulnerability.file_path}</p>
+                        <p><strong>Line:</strong> ${vulnerability.line_number}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Description:</h6>
+                        <p>${vulnerability.description}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Code:</h6>
+                        <pre class="code-block">${vulnerability.code}</pre>
+                    </div>
+                `;
+                
+                // If AI assessment is available
+                if (vulnerability.ai_assessment) {
+                    modalHtml += `
+                        <div class="mb-3">
+                            <h6>AI Assessment:</h6>
+                            <p>${vulnerability.ai_assessment.explanation}</p>
+                            <p><strong>Confidence:</strong> ${vulnerability.ai_assessment.confidence}</p>
+                        </div>
+                    `;
+                }
+                
+                // If remediation advice is available
+                if (vulnerability.remediation) {
+                    modalHtml += `
+                        <div class="mb-3">
+                            <h6>Remediation:</h6>
+                            <p>${vulnerability.remediation}</p>
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('vulnerabilityModalBody').innerHTML = modalHtml;
+            });
+        });
+        
+        // Filtering functionality
+        const searchInput = document.getElementById('vulnerabilitySearch');
+        const severityFilter = document.getElementById('severityFilter');
+        const table = document.getElementById('vulnerabilityTable');
+        const rows = table.querySelectorAll('tbody tr');
+        
+        function filterTable() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const severity = severityFilter.value;
+            
+            rows.forEach(row => {
+                const rowSeverity = row.getAttribute('data-severity');
+                const textContent = row.textContent.toLowerCase();
+                
+                const matchesSeverity = severity === 'all' || rowSeverity === severity;
+                const matchesSearch = searchTerm === '' || textContent.includes(searchTerm);
+                
+                row.style.display = matchesSeverity && matchesSearch ? '' : 'none';
+            });
+        }
+        
+        searchInput.addEventListener('input', filterTable);
+        severityFilter.addEventListener('change', filterTable);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block banner %}
+<div class="banner">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <h1 class="logo-text"><span class="zero">Zero</span><span class="hunt">Hunt</span><span class="ai">AI</span></h1>
+                <h3>AI-powered Vulnerability Scanner</h3>
+                <p class="lead">Scan your code for potential security vulnerabilities using advanced pattern detection and AI risk assessment.</p>
+            </div>
+            <div class="col-md-4 d-flex align-items-center justify-content-center">
+                <i class="fas fa-shield-alt fa-5x text-primary"></i>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-dark">
+                <h3 class="card-title mb-0 text-white">Start a New Scan</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('scan') }}" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.scan_mode.label(class="form-label") }}
+                        {{ form.scan_mode(class="form-select", id="scanMode") }}
+                    </div>
+                    
+                    <div id="githubSection" class="mb-3" style="display: none;">
+                        {{ form.github_url.label(class="form-label") }}
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fab fa-github"></i></span>
+                            {{ form.github_url(class="form-control", placeholder="https://github.com/username/repository") }}
+                        </div>
+                        <div class="form-text">Enter the full URL to a GitHub repository</div>
+                    </div>
+                    
+                    <div id="fileSection" class="mb-3">
+                        {{ form.files.label(class="form-label") }}
+                        {{ form.files(class="form-control", multiple=True) }}
+                        <div class="form-text">Upload multiple files or a zip archive containing your code</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.language_extensions.label(class="form-label") }}
+                        {{ form.language_extensions(class="form-control", placeholder="py,js,php,java") }}
+                        <div class="form-text">Leave empty to scan all supported file types</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            {{ form.enable_call_graph(class="form-check-input") }}
+                            {{ form.enable_call_graph.label(class="form-check-label") }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            {{ form.scan_secrets(class="form-check-input", checked=True) }}
+                            {{ form.scan_secrets.label(class="form-check-label") }}
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-primary btn-lg") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Features</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><i class="fas fa-code text-primary me-2"></i> Static Code Analysis</li>
+                    <li class="list-group-item"><i class="fas fa-brain text-primary me-2"></i> AI Risk Assessment</li>
+                    <li class="list-group-item"><i class="fas fa-bug text-primary me-2"></i> Vulnerability Detection</li>
+                    <li class="list-group-item"><i class="fas fa-key text-primary me-2"></i> Secret Detection</li>
+                    <li class="list-group-item"><i class="fas fa-project-diagram text-primary me-2"></i> Call Graph Visualization</li>
+                    <li class="list-group-item"><i class="fas fa-file-code text-primary me-2"></i> Multi-language Support</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Detects</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap">
+                    <span class="badge bg-danger m-1">SQL Injection</span>
+                    <span class="badge bg-danger m-1">Command Injection</span>
+                    <span class="badge bg-danger m-1">XSS</span>
+                    <span class="badge bg-warning m-1">Path Traversal</span>
+                    <span class="badge bg-warning m-1">Insecure Deserialization</span>
+                    <span class="badge bg-warning m-1">Unsafe File Operations</span>
+                    <span class="badge bg-info m-1">Hardcoded Secrets</span>
+                    <span class="badge bg-info m-1">Insecure Configs</span>
+                    <span class="badge bg-info m-1">Outdated Dependencies</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle between GitHub and file upload sections
+        const scanModeSelect = document.getElementById('scanMode');
+        const githubSection = document.getElementById('githubSection');
+        const fileSection = document.getElementById('fileSection');
+        
+        function updateSections() {
+            if (scanModeSelect.value === 'github') {
+                githubSection.style.display = 'block';
+                fileSection.style.display = 'none';
+            } else {
+                githubSection.style.display = 'none';
+                fileSection.style.display = 'block';
+            }
+        }
+        
+        scanModeSelect.addEventListener('change', updateSections);
+        updateSections();
+    });
+</script>
+{% endblock %}

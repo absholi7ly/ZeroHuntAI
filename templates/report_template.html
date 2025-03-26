@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZeroHuntAI Vulnerability Scan Report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 1rem;
+            padding-bottom: 3rem;
+        }
+        .severity-high {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .severity-medium {
+            color: #fd7e14;
+            font-weight: bold;
+        }
+        .severity-low {
+            color: #0dcaf0;
+            font-weight: bold;
+        }
+        .banner {
+            background-color: #343a40;
+            color: white;
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+        .high-card {
+            background-color: rgba(220, 53, 69, 0.1);
+            border: 1px solid rgba(220, 53, 69, 0.2);
+        }
+        .medium-card {
+            background-color: rgba(253, 126, 20, 0.1);
+            border: 1px solid rgba(253, 126, 20, 0.2);
+        }
+        .low-card {
+            background-color: rgba(13, 202, 240, 0.1);
+            border: 1px solid rgba(13, 202, 240, 0.2);
+        }
+        .code-block {
+            background-color: #f8f9fa;
+            padding: 0.5rem;
+            border-radius: 3px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="banner">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <h1><span class="text-danger">Zero</span><span class="text-light">Hunt</span><span class="text-primary">AI</span></h1>
+                    <h3>Vulnerability Scan Report</h3>
+                    <p>AI-powered Vulnerability Scanner</p>
+                </div>
+                <div class="col-md-4 text-end d-flex flex-column justify-content-center">
+                    <div class="report-meta">
+                        <p class="mb-0"><strong>Scan Date:</strong> {{TIMESTAMP}}</p>
+                        <p class="mb-0"><strong>Target:</strong> {{TARGET}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h2>Summary</h2>
+                <p>This report contains findings from a static analysis scan of the target codebase.</p>
+            </div>
+        </div>
+        
+        <div class="row mt-3">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <h3>{{TOTAL_FILES}}</h3>
+                    <p>Files Scanned</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card high-card">
+                    <h3 class="severity-high">{{HIGH_SEVERITY}}</h3>
+                    <p>High Severity</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card medium-card">
+                    <h3 class="severity-medium">{{MEDIUM_SEVERITY}}</h3>
+                    <p>Medium Severity</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card low-card">
+                    <h3 class="severity-low">{{LOW_SEVERITY}}</h3>
+                    <p>Low Severity</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <h2>Vulnerabilities ({{TOTAL_VULNERABILITIES}})</h2>
+                <div class="table-container">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Severity</th>
+                                <th>Type</th>
+                                <th>File</th>
+                                <th>Line</th>
+                                <th>Code</th>
+                                <th>Description</th>
+                                <th>AI Assessment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{VULNERABILITIES}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <h2>Secrets Detected ({{TOTAL_SECRETS}})</h2>
+                <div class="table-container">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>File</th>
+                                <th>Line</th>
+                                <th>Key</th>
+                                <th>Value Preview</th>
+                                <th>Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{SECRETS}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <h2>Next Steps</h2>
+                <ul>
+                    <li>Review and remediate high severity vulnerabilities first</li>
+                    <li>Use secure coding practices to prevent similar issues</li>
+                    <li>Implement proper input validation and output encoding</li>
+                    <li>Avoid using dangerous functions without proper security controls</li>
+                    <li>Consider running ZeroHuntAI regularly as part of your CI/CD pipeline</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12 text-center text-muted">
+                <p>Report generated by ZeroHuntAI - AI-powered Vulnerability Scanner</p>
+                <p><small>© 2025 ZeroHuntAI</small></p>
+                <p><small>By | absholi7ly</small></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
