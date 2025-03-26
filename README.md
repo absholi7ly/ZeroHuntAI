@@ -1,4 +1,4 @@
-# 📖ZeroHuntAI - AI-Powered Zero-Day Vulnerability Scanner
+# 📖ZeroHuntAI - AI-Powered Vulnerability Scanner
 ZeroHuntAI is an advanced, modular, and extensible source code vulnerability scanner designed to detect zero-day exploits and security weaknesses in local directories or GitHub repositories. Leveraging static code analysis, pattern matching, and AI-driven risk scoring, ZeroHuntAI empowers developers and security researchers to identify and mitigate threats like RCE, SQL Injection, XSS, and more.
 
 ![ZeroHuntAI Logo](img/ZeroHuntLogo.jpg)
